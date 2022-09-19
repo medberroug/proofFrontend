@@ -42,8 +42,13 @@ export const menuItems = [
         subItems: [
             {
                 id: 601,
-                label: 'menuitems.uielements.list.alerts',
-                link: '/'
+                label: 'Dashbaord',
+                link: '/admin/community/dashbaord'
+            },
+            {
+                id: 602,
+                label: 'Posts',
+                link: '/admin/community/posts'
             },
 
         ]

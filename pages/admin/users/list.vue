@@ -22,70 +22,8 @@ export default {
           active: true,
         },
       ],
-      userList: [
-        {
-          id: 1,
-          profile: require("~/assets/images/users/avatar-2.jpg"),
-          name: "Simon Ryles",
-          position: "Full Stack Developer",
-          email: "SimonRyles@minible.com",
-        },
-        {
-          id: 2,
-          profile: require("~/assets/images/users/avatar-3.jpg"),
-          name: "Marion Walker",
-          position: "Frontend Developer",
-          email: "MarionWalker@minible.com",
-        },
-        {
-          id: 3,
-          name: "Frederick White",
-          position: "Frontend Developer",
-          email: "MarionWalker@minible.com",
-        },
-        {
-          id: 4,
-          profile: require("~/assets/images/users/avatar-4.jpg"),
-          name: "Shanon Marvin",
-          position: "Backend Developer",
-          email: "ShanonMarvin@minible.com",
-        },
-        {
-          id: 5,
-          name: "Mark Jones",
-          position: "Frontend Developer",
-          email: "MarkJones@minible.com",
-        },
-        {
-          id: 6,
-          profile: require("~/assets/images/users/avatar-7.jpg"),
-          name: "Patrick Petty",
-          position: "UI/UX Designer",
-          email: "PatrickPetty@minible.com",
-        },
-        {
-          id: 7,
-          profile: require("~/assets/images/users/avatar-8.jpg"),
-          name: "Marilyn Horton",
-          position: "Backend Developer",
-          email: "MarilynHorton@minible.com",
-        },
-        {
-          id: 8,
-          profile: require("~/assets/images/users/avatar-2.jpg"),
-          name: "Neal Womack",
-          position: "Full Stack Developer",
-          email: "NealWomack@minible.com",
-        },
-        {
-          id: 9,
-          profile: require("~/assets/images/users/avatar-2.jpg"),
-          name: "Steven Williams",
-          position: "Frontend Developer",
-          email: "StevenWilliams@minible.com",
-        },
-      ],
-      profiles:[],
+
+      profiles: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -97,15 +35,21 @@ export default {
       fields: [
         {
           key: "fullName",
-          label:"Full Name"
+          label: "Full Name",
         },
         {
-          key: "position",
+          key: "phone",
+          label: "Phone",
         },
         {
-          key: "email",
+          key: "city",
+          label: "City",
         },
-        "action",
+        {
+          key: "accountStatus",
+          label: "Status",
+        },
+        "actions",
       ],
     };
   },
@@ -114,7 +58,7 @@ export default {
      * Total no. of records
      */
     rows() {
-      return this.userList.length;
+      return this.profiles.length;
     },
   },
 
@@ -122,19 +66,27 @@ export default {
     try {
       this.totalRows = this.items.length;
       this.baseUrl = process.env.baseUrl;
-      let result = await axios.get(process.env.baseUrl + "/profiles");
+      console.log(process.env.baseUrl + "/userprofiles");
+      let result = await axios.get(process.env.baseUrl + "/userprofiles");
       result = result.data;
 
-      for(let i=0;i<result.length;i++){
-        let newProfile={
-            fullName: result[i].attributes.firstName+" "+ result[i].attributes.lastName,
-            city: null,
-            photo: null,
-            phone: result[i].attributes.phone,
+      for (let i = 0; i < result.length; i++) {
+        let accountStatus = "active";
+        if (result[i].userId.blocked) {
+          accountStatus = "blocked";
+        } else if (!result[i].userId.confirmed && !result[i].userId.blocked) {
+          accountStatus = "pending";
         }
-        this.profiles.push()
+        let newProfile = {
+          fullName: result[i].firstName + " " + result[i].lastName,
+          city: result[i].address.city,
+          photo: this.baseUrl + result[i].photo.url,
+          phone: result[i].phone,
+          accountStatus: accountStatus,
+        };
+        this.profiles.push(newProfile);
       }
-      console.log(result);
+      console.log(this.profiles);
     } catch (error) {}
   },
   methods: {
@@ -155,6 +107,15 @@ export default {
   <div>
     <PageHeader :title="title" :items="items" />
     <div class="row">
+      <div class="col-sm-12 col-md-3">
+        <b-button variant="primary">
+           <i class="uil uil-plus mr-2"></i>
+          Add new
+         
+        </b-button>
+      </div>
+    </div>
+    <div class="row mt-3">
       <div class="col-12">
         <div class="card">
           <div class="card-body">
@@ -162,7 +123,7 @@ export default {
             <div class="table-responsive mb-0">
               <b-table
                 class="table table-centered table-nowrap"
-                :items="userList"
+                :items="profiles"
                 :fields="fields"
                 responsive="sm"
                 :per-page="perPage"
@@ -179,15 +140,15 @@ export default {
                                     <label class="custom-control-label" :for="`contacusercheck${data.item.id}`"></label>
                                 </div>
                             </template> -->
-                <template v-slot:cell(name)="data">
+                <template v-slot:cell(fullName)="data">
                   <img
-                    v-if="data.item.profile"
-                    :src="data.item.profile"
+                    v-if="data.item.photo"
+                    :src="data.item.photo"
                     alt
                     class="avatar-xs rounded-circle me-2"
                   />
                   <div
-                    v-if="!data.item.profile"
+                    v-if="!data.item.photo"
                     class="avatar-xs d-inline-block me-2"
                   >
                     <div
@@ -201,9 +162,23 @@ export default {
                       <i class="mdi mdi-account-circle m-0"></i>
                     </div>
                   </div>
-                  <a href="#" class="text-body">{{ data.item.name }}</a>
+                  <a href="#" class="text-body">
+                    <b> {{ data.item.fullName }}</b>
+                  </a>
                 </template>
-                <template v-slot:cell(action)>
+                <template v-slot:cell(accountStatus)="data">
+                  <div
+                    class="badge badge-pill bg-soft-success font-size-12"
+                    :class="{
+                      'bg-soft-warning': data.item.accountStatus === 'pending',
+                      'bg-soft-success': data.item.accountStatus === 'active',
+                      'bg-soft-danger': data.item.accountStatus === 'blocked',
+                    }"
+                  >
+                    {{ data.item.accountStatus }}
+                  </div>
+                </template>
+                <template v-slot:cell(actions)>
                   <ul class="list-inline mb-0">
                     <li class="list-inline-item">
                       <a
@@ -235,9 +210,8 @@ export default {
                         <i class="uil uil-ellipsis-v"></i>
                       </template>
 
-                      <a class="dropdown-item" href="#">Action</a>
-                      <a class="dropdown-item" href="#">Another action</a>
-                      <a class="dropdown-item" href="#">Something else here</a>
+                      <a class="dropdown-item" href="#">Block</a>
+                      <a class="dropdown-item" href="#">Confirm</a>
                     </b-dropdown>
                   </ul>
                 </template>

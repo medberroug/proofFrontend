@@ -276,11 +276,11 @@ export default {
 </script>
 
 <template>
-  <header id="page-topbar">
-    <div class="navbar-header">
+  <header id="page-topbar" >
+    <div class="navbar-header ">
       <div class="d-flex">
         <!-- LOGO -->
-        <div class="navbar-brand-box">
+        <div class="navbar-brand-box mt-3">
           <nuxt-link to="/" class="logo logo-dark">
             <span class="logo-sm">
               <img src="~/assets/images/logowhiteicon.png" alt height="40" />
