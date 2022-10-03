@@ -1,36 +1,52 @@
 <script>
+import axios from "axios";
 /**
  * Dashboard component
  */
+
 export default {
-    head() {
-        return {
-            title: `${this.title} | Nuxtjs Responsive Bootstrap 5 Admin Dashboard`,
-        };
-    },
-    data() {
-        return {
-            title: "Dashboard",
-            items: [{
-                    text: "Minible",
-                },
-                {
-                    text: "Dashboard",
-                    active: true,
-                },
-            ],
-        };
-    },
-    middleware: "authentication",
+  layout: "auth",
+  head() {
+    return {
+      title: `${this.title} | Proof, A community for a healthy family.`,
+    };
+  },
+  data() {
+    return {
+      title: "Proof",
+      items: [
+        {
+          text: "Minible",
+        },
+        {
+          text: "Dashboard",
+          active: true,
+        },
+      ],
+    };
+  },
+  methods: {},
+  // middleware: "authentication",
 };
 </script>
 
 <template>
-<div>
-    <PageHeader :title="title" :items="items" />
+  <div>
+    <center class="myLogo">
+      <img
 
-   
-</div>
+      width="150"
+        src="~/assets/images/logoProofColors.png"
+        alt
+        class="img-fluid mx-auto d-block "
+      />
+      <h3 class="p-3 text-black">Soon...</h3>
+    </center>
+  </div>
 </template>
 
-<style></style>
+<style>
+.myLogo{
+  padding-top: 40vh;
+}
+</style>

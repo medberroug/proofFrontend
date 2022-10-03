@@ -3,7 +3,7 @@ export const menuItems = [
         id: 1,
         label: 'Dashbaord',
         icon: 'uil-home-alt',
-        link: '/'
+        link: '/admin'
     },
     {
         id: 2,
@@ -25,13 +25,13 @@ export const menuItems = [
         subItems: [
             {
                 id: 501,
-                label: 'menuitems.uielements.list.alerts',
-                link: '/'
+                label: 'Blog posts',
+                link: '/admin/blog'
             },
             {
                 id: 502,
-                label: 'menuitems.uielements.list.notifications',
-                link: '/'
+                label: 'Categories',
+                link: '/admin/blog/catgories'
             }
         ]
     },
@@ -61,7 +61,7 @@ export const menuItems = [
             {
                 id: 3,
                 label: 'menuitems.uielements.list.alerts',
-                link: '/'
+                link: '/admin'
             },
 
         ]
@@ -74,7 +74,7 @@ export const menuItems = [
             {
                 id: 3,
                 label: 'menuitems.uielements.list.alerts',
-                link: '/'
+                link: '/admin'
             },
 
         ]
