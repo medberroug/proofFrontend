@@ -31,7 +31,7 @@ export const menuItems = [
             {
                 id: 502,
                 label: 'Categories',
-                link: '/admin/blog/catgories'
+                link: '/admin/blog/categories'
             }
         ]
     },

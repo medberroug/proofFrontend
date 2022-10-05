@@ -128,10 +128,12 @@ export default {
     <PageHeader :title="title" :items="items" />
     <div class="row">
       <div class="col-sm-12 col-md-3">
-        <b-button variant="primary">
-          <i class="uil uil-plus mr-2"></i>
-          Add new
-        </b-button>
+        <NuxtLink to="/admin/blog/newBlog">
+          <b-button variant="primary">
+            <i class="uil uil-plus mr-2"></i>
+            Add new
+          </b-button></NuxtLink
+        >
       </div>
     </div>
     <div class="row mt-3">
