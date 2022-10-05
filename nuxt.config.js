@@ -90,7 +90,7 @@ export default {
     message: process.env.VUE_APP_MESSAGINGSENDERID,
     appid: process.env.VUE_APP_APPId,
     measurement: process.env.VUE_APP_MEASUREMENTID,
-    // baseUrl: process.env.VUE_APP_BASE_URL || 'https://api.proof.ma'
-    baseUrl: process.env.VUE_APP_BASE_URL || 'http://localhost:1337'
+    baseUrl: process.env.VUE_APP_BASE_URL || 'https://api.proof.ma'
+    // baseUrl: process.env.VUE_APP_BASE_URL || 'http://localhost:1337'
   }
 };
