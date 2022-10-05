@@ -48,7 +48,7 @@ export default {
             role: result.user.role.name,
             jwt: result.jwt,
           };
-          if (!signedUser.confirmed) {
+          if (signedUser.confirmed) {
             persistData("account", signedUser);
             this.$router.push("/admin");
           }
