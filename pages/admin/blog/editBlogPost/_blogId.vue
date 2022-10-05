@@ -5,7 +5,7 @@ import axios from "axios";
 import vue2Dropzone from "vue2-dropzone";
 
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
-import { getData } from "../../../components/controllers/savingData";
+import { getData } from "../../../../components/controllers/savingData";
 /**
  * Editor component
  */
@@ -64,14 +64,16 @@ export default {
   methods: {
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
+      this.blogPost.images=null
     },
     async submit() {
       let formData = new FormData();
 
       // this.fileMissing = true;
-      if (this.file) {
-        formData.append("files", this.file);
-        try {
+
+      try {
+        if (this.file) {
+          formData.append("files", this.file);
           let myImage = await axios
             .post(process.env.baseUrl + "/upload", formData)
             .catch((err) => {
@@ -79,32 +81,42 @@ export default {
             });
           myImage = myImage.data;
           console.log(myImage[0].id);
-          this.blogPost.by = getData("account").id;
           this.blogPost.images = [
             {
               id: myImage[0].id,
             },
           ];
-          if(this.blogPost.status){
-            this.blogPost.publishTime= new Date()
-          }
-          // this.$router.push("/clients/note-de-frais/" + result.data.id);
-          console.log(this.blogPost);
-          let result2 = await axios
-            .post(process.env.baseUrl + "/blogPosts",  this.blogPost)
-        } catch (error) {
-          console.log(error);
         }
-      }
+        let result2 = await axios.put(
+          process.env.baseUrl + "/blogPosts/" + this.$route.params.blogId,
+          {
+            title: this.blogPost.title,
+            text: this.blogPost.text,
+            status: this.blogPost.status,
+            images: this.blogPost.images,
+            category: this.blogPost.category,
+            badge: this.blogPost.badge,
+            publishTime: this.blogPost.publishTime,
+          }
+        );
+        this.$router.push("/admin/blog");
+      } catch (error) {}
     },
   },
   async mounted() {
     try {
       this.baseUrl = process.env.baseUrl;
+
       let result = await axios.get(process.env.baseUrl + "/categories");
       result = result.data.category;
       this.categoriesList = result;
       console.log(this.categoriesList);
+      let result2 = await axios.get(
+        process.env.baseUrl + "/blogposts/" + this.$route.params.blogId
+      );
+      result2 = result2.data;
+      console.log(result2);
+      this.blogPost = result2;
     } catch (error) {
       console.log(error);
     }
@@ -217,6 +229,7 @@ export default {
                     v-on:change="handleFileUpload()"
                   />
                 </b-form-group>
+                <center v-if="blogPost.images"><img v-if="blogPost.images[0]" :src=" baseUrl+blogPost.images[0].url" width="60%"></center>
               </div>
             </div>
           </div>

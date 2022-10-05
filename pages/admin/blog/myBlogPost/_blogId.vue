@@ -3,9 +3,10 @@ import CKEditor from "@ckeditor/ckeditor5-vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import axios from "axios";
 import vue2Dropzone from "vue2-dropzone";
-
+import { eoLocale } from "date-fns/locale/eo";
+import { format, parseISO } from "date-fns";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
-import { getData } from "../../../components/controllers/savingData";
+import { getData } from "../../../../components/controllers/savingData";
 /**
  * Editor component
  */
@@ -22,14 +23,14 @@ export default {
 
   data() {
     return {
-      title: "New blog post",
+      title: "Blog post",
       items: [
         {
           text: "Blog",
           href: "/",
         },
         {
-          text: "New blog post",
+          text: "Blog post",
           active: true,
         },
       ],
@@ -64,14 +65,22 @@ export default {
   methods: {
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
+      this.blogPost.images = null;
+    },
+    formateDate(date) {
+      let result = format(parseISO(date), "dd/MM/yyyy hh:mm", {
+        locale: eoLocale,
+      });
+      return result;
     },
     async submit() {
       let formData = new FormData();
 
       // this.fileMissing = true;
-      if (this.file) {
-        formData.append("files", this.file);
-        try {
+
+      try {
+        if (this.file) {
+          formData.append("files", this.file);
           let myImage = await axios
             .post(process.env.baseUrl + "/upload", formData)
             .catch((err) => {
@@ -79,32 +88,42 @@ export default {
             });
           myImage = myImage.data;
           console.log(myImage[0].id);
-          this.blogPost.by = getData("account").id;
           this.blogPost.images = [
             {
               id: myImage[0].id,
             },
           ];
-          if(this.blogPost.status){
-            this.blogPost.publishTime= new Date()
-          }
-          // this.$router.push("/clients/note-de-frais/" + result.data.id);
-          console.log(this.blogPost);
-          let result2 = await axios
-            .post(process.env.baseUrl + "/blogPosts",  this.blogPost)
-        } catch (error) {
-          console.log(error);
         }
-      }
+        let result2 = await axios.put(
+          process.env.baseUrl + "/blogPosts/" + this.$route.params.blogId,
+          {
+            title: this.blogPost.title,
+            text: this.blogPost.text,
+            status: this.blogPost.status,
+            images: this.blogPost.images,
+            category: this.blogPost.category,
+            badge: this.blogPost.badge,
+            publishTime: this.blogPost.publishTime,
+          }
+        );
+        this.$router.push("/admin/blog");
+      } catch (error) {}
     },
   },
   async mounted() {
     try {
       this.baseUrl = process.env.baseUrl;
+
       let result = await axios.get(process.env.baseUrl + "/categories");
       result = result.data.category;
       this.categoriesList = result;
       console.log(this.categoriesList);
+      let result2 = await axios.get(
+        process.env.baseUrl + "/blogposts/" + this.$route.params.blogId
+      );
+      result2 = result2.data;
+      console.log(result2);
+      this.blogPost = result2;
     } catch (error) {
       console.log(error);
     }
@@ -129,19 +148,13 @@ export default {
                     for="title"
                     placeholder="Insert your title here..."
                     v-model="blogPost.title"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
 
                 <b-form-group class="mb-3" label="Content" label-for="title">
-                  <ckeditor v-model="blogPost.text" :editor="editor"></ckeditor>
+                  <div v-html="blogPost.text">{{ blogPost.text }}</div>
                 </b-form-group>
-
-                <center>
-                  <b-button variant="primary" @click="submit">
-                    Submit
-                    <!-- <i class="uil uil-plus mr-2"></i> -->
-                  </b-button>
-                </center>
               </div>
               <div class="col-4">
                 <b-form-group
@@ -149,19 +162,10 @@ export default {
                   label="Publishing status"
                   label-for="title"
                 >
-                  <b-form-radio
-                    v-model="blogPost.status"
-                    class="custom-radio mb-3"
-                    :value="false"
-                    plain
-                    >Publish later</b-form-radio
-                  ><b-form-radio
-                    v-model="blogPost.status"
-                    class="mb-3"
-                    :value="true"
-                    plain
-                    >Publish after submit</b-form-radio
-                  >
+                  <p class="text-success" v-if="blogPost.status">
+                    <b>Published</b>
+                  </p>
+                  <p class="text-danger" v-else><b>Unpublished</b></p>
                 </b-form-group>
                 <b-form-group
                   class="mb-3"
@@ -169,29 +173,15 @@ export default {
                   label-for="title"
                   v-if="blogPost.status == false"
                 >
-                  <b-form-input
-                    id="date-time"
-                    type="datetime-local"
-                    v-model="blogPost.publishTime"
-                  ></b-form-input>
+                  <p v-if="!blogPost.status & blogPost.publishTime">
+                    <b>{{ formateDate(blogPost.publishTime) }} </b>
+                  </p>
                 </b-form-group>
                 <b-form-group class="mb-3" label="Category" label-for="title">
-                  <select class="form-select" v-model="blogPost.category">
-                    <option>Select a category</option>
-                    <option
-                      v-for="(category, index) in categoriesList"
-                      :key="index"
-                    >
-                      {{ category.name }}
-                    </option>
-                  </select>
+                  <b>{{ blogPost.category }}</b>
                 </b-form-group>
                 <b-form-group class="mb-3" label="Badge" label-for="Badge">
-                  <b-form-input
-                    for="Badge"
-                    placeholder="e.g Exlusive..."
-                    v-model="blogPost.badge"
-                  ></b-form-input>
+                  <b>{{ blogPost.badge }}</b>
                 </b-form-group>
                 <b-form-group
                   class="mb-3"
@@ -209,14 +199,15 @@ export default {
                       <h4>Drop files here or click to upload.</h4>
                     </div>
                   </vue-dropzone> -->
-                  <input
-                    type="file"
-                    id="file"
-                    ref="file"
-                    class="m-2"
-                    v-on:change="handleFileUpload()"
-                  />
+                
                 </b-form-group>
+                <center v-if="blogPost.images">
+                  <img
+                    v-if="blogPost.images[0]"
+                    :src="baseUrl + blogPost.images[0].url"
+                    width="60%"
+                  />
+                </center>
               </div>
             </div>
           </div>

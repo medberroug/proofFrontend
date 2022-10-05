@@ -29,6 +29,7 @@ export default {
       blogPosts: [],
       blogPosts: [],
       totalRows: 1,
+      
       currentPage: 1,
       perPage: 10,
       pageOptions: [10, 25, 50, 100],
@@ -222,6 +223,7 @@ export default {
                 <template v-slot:cell(actions)="data">
                   <ul class="list-inline mb-0">
                     <li class="list-inline-item">
+                      <NuxtLink :to="'/admin/blog/myBlogPost/'+data.item.id">
                       <a
                         href="javascript:void(0);"
                         class="px-2 text-primary"
@@ -229,17 +231,18 @@ export default {
                         title="View"
                       >
                         <i class="uil uil-eye font-size-18"></i>
-                      </a>
+                      </a></NuxtLink>
                     </li>
                     <li class="list-inline-item">
-                      <a
-                        href="javascript:void(0);"
-                        class="px-2 text-primary"
-                        v-b-tooltip.hover
-                        title="Edit"
-                      >
-                        <i class="uil uil-pen font-size-18"></i>
-                      </a>
+                      <NuxtLink :to="'/admin/blog/editBlogPost/'+data.item.id">
+                        <a
+                          href="javascript:void(0);"
+                          class="px-2 text-primary"
+                          v-b-tooltip.hover
+                          title="Edit"
+                        >
+                          <i class="uil uil-pen font-size-18"></i> </a
+                      ></NuxtLink>
                     </li>
                     <li
                       class="list-inline-item"
