@@ -85,13 +85,16 @@ export default {
               id: myImage[0].id,
             },
           ];
-          if(this.blogPost.status){
-            this.blogPost.publishTime= new Date()
+          if (this.blogPost.status) {
+            this.blogPost.publishTime = new Date();
           }
           // this.$router.push("/clients/note-de-frais/" + result.data.id);
           console.log(this.blogPost);
-          let result2 = await axios
-            .post(process.env.baseUrl + "/blogPosts",  this.blogPost)
+          let result2 = await axios.post(
+            process.env.baseUrl + "/blogPosts",
+            this.blogPost
+          );
+          this.$router.push("/admin/blog");
         } catch (error) {
           console.log(error);
         }
