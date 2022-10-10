@@ -3,7 +3,8 @@ import CKEditor from "@ckeditor/ckeditor5-vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import axios from "axios";
 import vue2Dropzone from "vue2-dropzone";
-
+import Multiselect from "vue-multiselect";
+import "vue-multiselect/dist/vue-multiselect.min.css";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
 import { getData } from "../../../components/controllers/savingData";
 /**
@@ -22,18 +23,18 @@ export default {
 
   data() {
     return {
-      title: "New blog post",
+      title: "New community post",
       items: [
         {
-          text: "Blog",
+          text: "Community",
           href: "/",
         },
         {
-          text: "New blog post",
+          text: "New community post",
           active: true,
         },
       ],
-      loading:false,
+      loading: false,
       dropzoneOptions: {
         url: "https://api.proof.ma/upload",
         thumbnailWidth: 150,
@@ -46,33 +47,36 @@ export default {
       editorData:
         "<h3>Hello World!</h3><h5><b>This is an simple editable area.</b></h5>",
       status: false,
+      selectedPoster: null,
       baseUrl: null,
+      robotsList: [],
+      robots: [],
       showCreated: false,
       categoriesList: null,
       fileMissing: false,
       file: "",
-      blogPost: {
-        title: null,
+      post: {
         text: null,
         status: false,
-        images: [],
+        images: null,
         by: null,
-        category: null,
-        badge: null,
         publishTime: null,
       },
     };
+  },
+  components: {
+    Multiselect,
   },
   methods: {
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
     },
     async submit() {
-        this.loading=true
+      this.loading = true;
       let formData = new FormData();
 
       // this.fileMissing = true;
-      if (this.file) {
+      if (this.file &&  this.selectedPoster) {
         formData.append("files", this.file);
         try {
           let myImage = await axios
@@ -82,26 +86,64 @@ export default {
             });
           myImage = myImage.data;
           console.log(myImage[0].id);
-          this.blogPost.by = getData("account").id;
-          this.blogPost.images = [
-            {
-              id: myImage[0].id,
-            },
-          ];
-          if (this.blogPost.status) {
-            this.blogPost.publishTime = new Date();
+          for (let k = 0; k < this.robots.length; k++) {
+            if (
+              this.selectedPoster == this.robots[k].userid.username &&
+              this.selectedPoster != null
+            ) {
+               this.post.by= this.robots[k].id
+            }
+          }
+          this.post.images = {
+            id: myImage[0].id,
+          };
+
+          if (this.post.status) {
+            this.post.publishTime = new Date();
           }
           // this.$router.push("/clients/note-de-frais/" + result.data.id);
-          console.log(this.blogPost);
+          console.log(this.post);
           let result2 = await axios.post(
-            process.env.baseUrl + "/blogPosts",
-            this.blogPost
+            process.env.baseUrl + "/posts",
+            this.post
           );
           console.log(result2.data);
           this.showCreated = true;
           const delay = (ms) => new Promise((res) => setTimeout(res, ms));
           await delay(5000);
-          this.$router.push("/admin/blog/myBlogPost/" + result2.data.id);
+          this.$router.push("/admin/community/" + result2.data.id);
+        } catch (error) {
+          console.log(error);
+        }
+      } else if(this.selectedPoster) {
+ try {
+         
+
+
+          for (let k = 0; k < this.robots.length; k++) {
+            if (
+              this.selectedPoster == this.robots[k].userid.username &&
+              this.selectedPoster != null
+            ) {
+               this.post.by= this.robots[k].id
+            }
+          }
+
+
+          if (this.post.status) {
+            this.post.publishTime = new Date();
+          }
+          // this.$router.push("/clients/note-de-frais/" + result.data.id);
+          console.log(this.post);
+          let result2 = await axios.post(
+            process.env.baseUrl + "/posts",
+            this.post
+          );
+          console.log(result2.data);
+          this.showCreated = true;
+          const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+          await delay(5000);
+          this.$router.push("/admin/community/" + result2.data.id);
         } catch (error) {
           console.log(error);
         }
@@ -115,6 +157,16 @@ export default {
       result = result.data.category;
       this.categoriesList = result;
       console.log(this.categoriesList);
+      let allRobotUsers = await axios.get(
+        process.env.baseUrl + "/userProfiles?robot=true"
+      );
+      allRobotUsers = allRobotUsers.data;
+
+      for (let j = 0; j < allRobotUsers.length; j++) {
+        this.robotsList.push(allRobotUsers[j].userid.username);
+      }
+      console.log(this.robotsList);
+      this.robots = allRobotUsers;
     } catch (error) {
       console.log(error);
     }
@@ -129,7 +181,7 @@ export default {
     <div class="row">
       <div class="col-12">
         <b-alert show v-if="showCreated" variant="success" class="mb-3">
-          <i class="uil uil-check"></i> <b>Blog post was been created</b>, you
+          <i class="uil uil-check"></i> <b>Community post was been created</b>, you
           will be redirected to it in 5 seconds...
         </b-alert>
         <div class="card">
@@ -138,21 +190,25 @@ export default {
               <div class="col-8 pl-2">
                 <!-- <h4 class="card-title mb-4">Add a new blog post</h4> -->
                 <!-- Editor -->
-                <b-form-group class="mb-3" label="Title" label-for="title">
-                  <b-form-input
-                    for="title"
-                    placeholder="Insert your title here..."
-                    v-model="blogPost.title"
-                  ></b-form-input>
-                </b-form-group>
 
                 <b-form-group class="mb-3" label="Content" label-for="title">
-                  <ckeditor v-model="blogPost.text" :editor="editor"></ckeditor>
+                  <textarea
+                    class="form-control"
+                    id="productdesc"
+                    rows="2"
+                    v-model="post.text"
+                  ></textarea>
                 </b-form-group>
 
                 <center>
-                  <b-button variant="primary" @click="submit" >
-                     <span v-if="loading" class="spinner-border spinner-border-sm " role="status" aria-hidden="true"></span> Submit
+                  <b-button variant="primary" @click="submit">
+                    <span
+                      v-if="loading"
+                      class="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    Submit
                     <!-- <i class="uil uil-plus mr-2"></i> -->
                   </b-button>
                 </center>
@@ -164,13 +220,13 @@ export default {
                   label-for="title"
                 >
                   <b-form-radio
-                    v-model="blogPost.status"
+                    v-model="post.status"
                     class="custom-radio mb-3"
                     :value="false"
                     plain
                     >Publish later</b-form-radio
                   ><b-form-radio
-                    v-model="blogPost.status"
+                    v-model="post.status"
                     class="mb-3"
                     :value="true"
                     plain
@@ -181,37 +237,27 @@ export default {
                   class="mb-3"
                   label="Publishing date"
                   label-for="title"
-                  v-if="blogPost.status == false"
+                  v-if="post.status == false"
                 >
                   <b-form-input
                     id="date-time"
                     type="datetime-local"
-                    v-model="blogPost.publishTime"
-                  ></b-form-input>
-                </b-form-group>
-                <b-form-group class="mb-3" label="Category" label-for="title">
-                  <select class="form-select" v-model="blogPost.category">
-                    <option>Select a category</option>
-                    <option
-                      v-for="(category, index) in categoriesList"
-                      :key="index"
-                    >
-                      {{ category.name }}
-                    </option>
-                  </select>
-                </b-form-group>
-                <b-form-group class="mb-3" label="Badge" label-for="Badge">
-                  <b-form-input
-                    for="Badge"
-                    placeholder="e.g Exlusive..."
-                    v-model="blogPost.badge"
+                    v-model="post.publishTime"
                   ></b-form-input>
                 </b-form-group>
                 <b-form-group
                   class="mb-3"
-                  label="Cover image"
-                  label-for="Badge"
+                  label="User (Robots only)"
+                  label-for="User (Robots only)"
                 >
+                  <multiselect
+                    v-model="selectedPoster"
+                    :options="robotsList"
+                    :multiple="false"
+                  ></multiselect>
+                  <b-form-group class="m-3" label="Image" label-for="Badge">
+                  </b-form-group>
+
                   <!-- <vue-dropzone
                     id="dropzone"
                     ref="file"

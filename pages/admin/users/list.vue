@@ -38,6 +38,10 @@ export default {
           label: "Full Name",
         },
         {
+          key: "username",
+          label: "Username",
+        },
+        {
           key: "phone",
           label: "Phone",
         },
@@ -48,6 +52,10 @@ export default {
         {
           key: "accountStatus",
           label: "Status",
+        },
+        {
+          key: "robot",
+          label: "Profile type",
         },
         "actions",
       ],
@@ -72,27 +80,60 @@ export default {
 
       for (let i = 0; i < result.length; i++) {
         let accountStatus = "active";
-        if (result[i].userId.blocked) {
+        if (result[i].userid.blocked) {
           accountStatus = "blocked";
-        } else if (!result[i].userId.confirmed && !result[i].userId.blocked) {
+        } else if (!result[i].userid.confirmed && !result[i].userid.blocked) {
           accountStatus = "pending";
         }
         let newProfile = {
+          id: result[i].id,
+          userid: result[i].userid.id,
           fullName: result[i].firstName + " " + result[i].lastName,
           city: result[i].address.city,
-          photo: this.baseUrl + result[i].photo.url,
+          photo: result[i].photo ? this.baseUrl + result[i].photo.url : null,
           phone: result[i].phone,
           accountStatus: accountStatus,
+          robot: result[i].robot,
+          username: result[i].userid.username,
+          blocked: result[i].userid.blocked,
+          confirmed: result[i].userid.confirmed,
         };
         this.profiles.push(newProfile);
       }
       console.log(this.profiles);
-    } catch (error) {}
+      console.log("XX");
+    } catch (error) {
+      console.log(error);
+    }
   },
   methods: {
     /**
      * Search the table data with search input
      */
+    async actionOnUser(id, action) {
+      try {
+        if (action == "confirm") {
+          let result = await axios.put(process.env.baseUrl + "/users/" + id, {
+            confirmed: true,
+          });
+        } else if (action == "block") {
+          let result = await axios.put(process.env.baseUrl + "/users/" + id, {
+            blocked: true,
+          });
+        } else if (action == "unblock") {
+          let result = await axios.put(process.env.baseUrl + "/users/" + id, {
+            blocked: false,
+          });
+        } else if (action == "unconfirm") {
+          let result = await axios.put(process.env.baseUrl + "/users/" + id, {
+            confirmed: false,
+          });
+        } else if (action == "delete") {
+          let result = await axios.delete(process.env.baseUrl + "/users/" + id);
+        }
+        this.$router.go();
+      } catch (error) {}
+    },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
@@ -106,13 +147,15 @@ export default {
 <template>
   <div>
     <PageHeader :title="title" :items="items" />
+
     <div class="row">
       <div class="col-sm-12 col-md-3">
-        <b-button variant="primary">
-           <i class="uil uil-plus mr-2"></i>
-          Add new
-         
-        </b-button>
+        <NuxtLink to="/admin/users/newUser">
+          <b-button variant="primary">
+            <i class="uil uil-plus mr-2"></i>
+            Add new
+          </b-button></NuxtLink
+        >
       </div>
     </div>
     <div class="row mt-3">
@@ -149,20 +192,16 @@ export default {
                   />
                   <div
                     v-if="!data.item.photo"
-                    class="avatar-xs d-inline-block me-2"
+                    class="avatar-xxs d-inline-block me-2"
                   >
-                    <div
-                      class="
-                        avatar-title
-                        bg-soft-Primary
-                        rounded-circle
-                        text-Primary
-                      "
-                    >
-                      <i class="mdi mdi-account-circle m-0"></i>
-                    </div>
+                    <img
+                      class="rounded-circle avatar-sm"
+                      alt="30x30"
+                      src="../../../assets/images/user.png"
+                      data-holder-rendered="true"
+                    />
                   </div>
-                  <a href="#" class="text-body">
+                  <a href="#" class="text-body m-3">
                     <b> {{ data.item.fullName }}</b>
                   </a>
                 </template>
@@ -178,19 +217,100 @@ export default {
                     {{ data.item.accountStatus }}
                   </div>
                 </template>
-                <template v-slot:cell(actions)>
+                <template v-slot:cell(robot)="data">
+                  <div
+                    class="
+                      badge badge-pill
+                      bg-soft-success
+                      font-size-12
+                      bg-soft-danger
+                    "
+                    v-if="data.item.robot"
+                  >
+                    <span>Robot</span>
+                  </div>
+                  <div
+                    class="
+                      badge badge-pill
+                      bg-soft-success
+                      font-size-12
+                      bg-soft-success
+                    "
+                    v-else
+                  >
+                    <span>Real user</span>
+                  </div>
+                </template>
+                <template v-slot:cell(actions)="data">
                   <ul class="list-inline mb-0">
                     <li class="list-inline-item">
                       <a
                         href="javascript:void(0);"
                         class="px-2 text-primary"
                         v-b-tooltip.hover
-                        title="Edit"
+                        title="View"
                       >
-                        <i class="uil uil-pen font-size-18"></i>
+                        <i class="uil uil-eye font-size-18"></i>
                       </a>
                     </li>
-                    <li class="list-inline-item">
+
+                    <li
+                      class="list-inline-item"
+                      v-if="!data.item.confirmed"
+                      @click="actionOnUser(data.item.userid, 'confirm')"
+                    >
+                      <a
+                        href="javascript:void(0);"
+                        class="px-2 text-success"
+                        v-b-tooltip.hover
+                        title="Confirm"
+                      >
+                        <i class="uil uil-shield-check font-size-18"></i>
+                      </a>
+                    </li>
+                    <li
+                      class="list-inline-item"
+                      v-if="data.item.confirmed"
+                      @click="actionOnUser(data.item.userid, 'unconfirm')"
+                    >
+                      <a
+                        href="javascript:void(0);"
+                        class="px-2 text-warning"
+                        v-b-tooltip.hover
+                        title="UnConfirm"
+                      >
+                        <i class="uil uil-shield-slash font-size-18"></i>
+                      </a>
+                    </li>
+                    <li
+                      class="list-inline-item"
+                      v-if="!data.item.blocked"
+                      @click="actionOnUser(data.item.userid, 'block')"
+                    >
+                      <a
+                        href="javascript:void(0);"
+                        class="px-2 text-warning"
+                        v-b-tooltip.hover
+                        title="Block"
+                      >
+                        <i class="uil uil-file-block-alt font-size-18"></i>
+                      </a>
+                    </li>
+                    <li
+                      class="list-inline-item"
+                      v-if="data.item.blocked"
+                      @click="actionOnUser(data.item.userid, 'unblock')"
+                    >
+                      <a
+                        href="javascript:void(0);"
+                        class="px-2 text-success"
+                        v-b-tooltip.hover
+                        title="UnBlock"
+                      >
+                        <i class="uil uil-file-check font-size-18"></i>
+                      </a>
+                    </li>
+                    <!-- <li class="list-inline-item" @click="actionOnUser(data.item.userid, 'delete')">
                       <a
                         href="javascript:void(0);"
                         class="px-2 text-danger"
@@ -199,20 +319,7 @@ export default {
                       >
                         <i class="uil uil-trash-alt font-size-18"></i>
                       </a>
-                    </li>
-                    <b-dropdown
-                      class="list-inline-item"
-                      variant="white"
-                      right
-                      toggle-class="text-muted font-size-18 px-2"
-                    >
-                      <template v-slot:button-content>
-                        <i class="uil uil-ellipsis-v"></i>
-                      </template>
-
-                      <a class="dropdown-item" href="#">Block</a>
-                      <a class="dropdown-item" href="#">Confirm</a>
-                    </b-dropdown>
+                    </li> -->
                   </ul>
                 </template>
               </b-table>

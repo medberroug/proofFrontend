@@ -30,8 +30,11 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
+      posts: [],
       sortBy: "age",
       sortDesc: false,
+      deleteMessage: false,
+      chosenPost: null,
       fields: [
         {
           key: "fullName",
@@ -66,36 +69,22 @@ export default {
     try {
       this.totalRows = this.items.length;
       this.baseUrl = process.env.baseUrl;
-      console.log(process.env.baseUrl + "/posts");
-      let result = await axios.get(process.env.baseUrl + "/posts");
+      let result = await axios.get(
+        process.env.baseUrl + "/getAllPostsForAdmin"
+      );
       result = result.data;
-      for (let i = 0; result.length; i++) {
-        let images = [];
-        for (let j = 0; j < result[i].images.length; j++) {
-          images.push(this.baseUrl + result[i].images[j].url);
-        }
-        let creator = await axios.get(
-          process.env.baseUrl + "/users/" + result[i].by.userId
-        );
-        creator = creator.data.username;
-        let newPost = {
-          id: result[i].id,
-          profileImage: result[i].by.photo.url,
-          postBy: creator,
-          postWhen: result[i].created_at,
-          text: result[i].text,
-          images: images,
-          status: result[i].status,
-        };
-        this.posts.push(newPost)
-      }
-      console.log(this.posts);
+      this.posts = result;
     } catch (error) {}
   },
   methods: {
     /**
      * Search the table data with search input
      */
+    async deletePost(id) {
+      let result = await axios.delete(process.env.baseUrl + "/posts/" + id);
+      this.$router.go();
+    },
+
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
@@ -109,38 +98,64 @@ export default {
 <template>
   <div>
     <PageHeader :title="title" :items="items" />
+    <b-modal v-model="deleteMessage" centered hide-footer v-if="posts">
+      <template #modal-title> Deleting a community post </template>
+      <center>
+        <p><b>You are deleting this post</b>, do you want to continue?</p>
+      </center>
+      <center>
+        <b-button
+          class="m-3"
+          block
+          variant="outline-danger"
+          @click="deletePost(chosenPost)"
+        >
+          Delete</b-button
+        >
+        <b-button
+          class="m-3"
+          block
+          variant="primary"
+          @click="deleteMessage = false"
+        >
+          Cancel</b-button
+        >
+      </center></b-modal
+    >
     <div class="row">
       <div class="col-sm-12 col-md-3">
-        <b-button variant="primary">
-          <i class="uil uil-plus mr-2"></i>
-          Add new
-        </b-button>
+        <NuxtLink to="/admin/community/newPost">
+          <b-button variant="primary">
+            <i class="uil uil-plus mr-2"></i>
+            Add new
+          </b-button></NuxtLink
+        >
       </div>
     </div>
     <div class="row mt-3">
-      <div class="col-md-3">
+      <div class="col-3" v-for="(post, index) in posts" :key="index">
         <b-card img-alt="Card image" img-bottom>
           <b-card-title>
             <div class="row">
               <div class="col-md-auto d-flex align-items-center">
-                <img v-if="false" alt class="avatar-xs rounded-circle me-2" />
-                <div v-if="true" class="avatar-xs d-inline-block me-2">
-                  <div
-                    class="
-                      avatar-title
-                      bg-soft-Primary
-                      rounded-circle
-                      text-Primary
-                    "
-                  >
-                    <i class="mdi mdi-account-circle m-0"></i>
-                  </div>
+                <div
+                  v-if="post.posterProfileImage"
+                  class="avatar-xs d-inline-block me-2"
+                >
+                  <img
+                    class="rounded-circle avatar-sm"
+                    alt="50x50"
+                    :src="baseUrl + post.posterProfileImage"
+                    data-holder-rendered="true"
+                  />
                 </div>
-              </div>
-              <div class="col-md-auto d-flex align-items-center">
-                <div>
-                  <h5 class="card-title">Card title</h5>
-                  <small class="text-muted">Last updated 3 mins ago</small>
+                <div v-else class="avatar-xs d-inline-block me-2">
+                  <img
+                    class="rounded-circle avatar-sm"
+                    alt="50x50"
+                    src="../../../assets/images/user.png"
+                    data-holder-rendered="true"
+                  />
                 </div>
               </div>
               <div
@@ -148,39 +163,52 @@ export default {
                   col-md-auto
                   d-flex
                   align-items-center
-                  justify-items-stretch
+                  justify-content-center
                 "
               >
+                <div class="row justify-content-end">
+                  <h5 class="card-title justify-content-end">
+                    {{ post.username }}
+                  </h5>
+                  <small class="text-muted">{{ post.created_at }}</small>
+                </div>
+              </div>
+              <div class="col-md-auto">
                 <div>
-                  <span><i class="uil uil-ellipsis-v"></i></span>
+                  <b-button-group>
+                    <NuxtLink :to="'/admin/community/' + post.id">
+                      <b-button variant="outline-primary"
+                        ><i class="uil uil-eye"></i></b-button
+                    ></NuxtLink>
+
+                    <b-button
+                      variant="outline-danger"
+                      @click="
+                        deleteMessage = true;
+                        chosenPost = post.id;
+                      "
+                      ><i class="uil uil-trash-alt"></i
+                    ></b-button>
+                  </b-button-group>
                 </div>
               </div>
             </div>
           </b-card-title>
-          <p></p>
-          <b-card-text>
+          <b-card-text class="m-3">
             <p>
-              This is a wider card with supporting text below as a natural
-              lead-in to additional content. This content is a little bit
-              longer.
+              {{ post.text }}
             </p>
           </b-card-text>
-          <b-carousel
-            style="text-shadow: 0px 0px 2px #000"
-            controls
-            indicators
-            fade
-          >
-            <b-carousel-slide
-              :img-src="require('~/assets/images/small/img-1.jpg')"
-            ></b-carousel-slide>
-            <b-carousel-slide
-              :img-src="require('~/assets/images/small/img-2.jpg')"
-            ></b-carousel-slide>
-            <b-carousel-slide
-              :img-src="require('~/assets/images/small/img-3.jpg')"
-            ></b-carousel-slide>
-          </b-carousel>
+
+          <img :src="baseUrl + post.image" alt="" width="100%" />
+          <div class="row mt-3">
+            <div class="col-6 d-flex justify-content-center">
+              <i class="uil uil-heart-alt">{{ post.nbOfLikes }}</i>
+            </div>
+            <div class="col-6 d-flex justify-content-center">
+              <i class="uil uil-comment-lines">{{ post.nbOfComments }}</i>
+            </div>
+          </div>
         </b-card>
       </div>
     </div>

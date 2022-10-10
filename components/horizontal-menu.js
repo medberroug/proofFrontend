@@ -15,7 +15,7 @@ export const menuItems = [
                 label: 'Users list',
                 link: '/admin/users/list'
             },
-            
+
         ]
     },
     {
@@ -40,11 +40,7 @@ export const menuItems = [
         label: 'Community',
         icon: 'uil-comments',
         subItems: [
-            {
-                id: 601,
-                label: 'Dashbaord',
-                link: '/admin/community/dashbaord'
-            },
+          
             {
                 id: 602,
                 label: 'Posts',
@@ -67,7 +63,20 @@ export const menuItems = [
         ]
     },
     {
-        id: 2,
+        id: 8,
+        label: 'Automation',
+        icon: 'uil-robot',
+        subItems: [
+            {
+                id: 3,
+                label: 'menuitems.uielements.list.alerts',
+                link: '/admin'
+            },
+
+        ]
+    },
+    {
+        id: 9,
         label: 'Settings',
         icon: 'uil-cog',
         subItems: [
@@ -78,7 +87,8 @@ export const menuItems = [
             },
 
         ]
-    },
+    }
+
 
 
 

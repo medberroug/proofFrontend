@@ -29,7 +29,7 @@ export default {
       blogPosts: [],
       blogPosts: [],
       totalRows: 1,
-      
+      chosenblogPost: null,
       currentPage: 1,
       perPage: 10,
       pageOptions: [10, 25, 50, 100],
@@ -37,6 +37,7 @@ export default {
       filterOn: [],
       sortBy: "age",
       sortDesc: false,
+      deleteMessage: false,
       fields: [
         {
           key: "id",
@@ -137,6 +138,30 @@ export default {
         >
       </div>
     </div>
+    <b-modal v-model="deleteMessage" centered hide-footer v-if="blogPosts">
+      <template #modal-title> Deleting a blog post </template>
+      <center>
+        <p><b>You are deleting this blog post</b>, do you want to continue?</p>
+      </center>
+      <center>
+        <b-button
+          class="m-3"
+          block
+          variant="outline-danger"
+          @click="actionOnPost(chosenblogPost, 'delete')"
+        >
+          Delete</b-button
+        >
+        <b-button
+          class="m-3"
+          block
+          variant="primary"
+          @click="deleteMessage = false"
+        >
+          Cancel</b-button
+        >
+      </center></b-modal
+    >
     <div class="row mt-3">
       <div class="col-12">
         <div class="card">
@@ -223,18 +248,20 @@ export default {
                 <template v-slot:cell(actions)="data">
                   <ul class="list-inline mb-0">
                     <li class="list-inline-item">
-                      <NuxtLink :to="'/admin/blog/myBlogPost/'+data.item.id">
-                      <a
-                        href="javascript:void(0);"
-                        class="px-2 text-primary"
-                        v-b-tooltip.hover
-                        title="View"
-                      >
-                        <i class="uil uil-eye font-size-18"></i>
-                      </a></NuxtLink>
+                      <NuxtLink :to="'/admin/blog/myBlogPost/' + data.item.id">
+                        <a
+                          href="javascript:void(0);"
+                          class="px-2 text-primary"
+                          v-b-tooltip.hover
+                          title="View"
+                        >
+                          <i class="uil uil-eye font-size-18"></i> </a
+                      ></NuxtLink>
                     </li>
                     <li class="list-inline-item">
-                      <NuxtLink :to="'/admin/blog/editBlogPost/'+data.item.id">
+                      <NuxtLink
+                        :to="'/admin/blog/editBlogPost/' + data.item.id"
+                      >
                         <a
                           href="javascript:void(0);"
                           class="px-2 text-primary"
@@ -274,7 +301,10 @@ export default {
                     </li>
                     <li
                       class="list-inline-item"
-                      @click="actionOnPost(data.item.id, 'delete')"
+                      @click="
+                        chosenblogPost = data.item.id;
+                        deleteMessage = true;
+                      "
                     >
                       <a
                         href="javascript:void(0);"
