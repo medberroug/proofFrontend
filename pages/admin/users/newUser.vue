@@ -67,9 +67,11 @@ export default {
         firstName: null,
         lastName: null,
         phone: null,
+        userid: null,
         badge: null,
         robot: null,
         photo: null,
+
         address: {
           city: null,
           country: "Maroc",
@@ -91,12 +93,47 @@ export default {
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
     },
+    async createNewUser() {
+      this.loading = true;
+      let formData = new FormData();
+      if (this.file) {
+        formData.append("files", this.file);
+        try {
+          let myImage = await axios
+            .post(process.env.baseUrl + "/upload", formData)
+            .catch((err) => {
+              this.fileMissing = true;
+            });
+          myImage = myImage.data;
+          this.newProfile.photo = {
+            id: myImage[0].id,
+          };
+          let result2 = await axios.post(
+            process.env.baseUrl + "/users",
+            this.newUser
+          );
+          console.log(result2.data);
+          this.newProfile.userid = { id: result2.data.id }
+          let result3 = await axios.post(
+            process.env.baseUrl + "/userProfiles",
+            this.newProfile
+          );
+          this.showCreated = true;
+          const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+          await delay(5000);
+          this.$router.push("/admin/users/" + result3.data.id);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    },
+
     async submit() {
       this.loading = true;
       let formData = new FormData();
 
       // this.fileMissing = true;
-      if (this.file && this.selectedPoster) {
+      if (this.file) {
         formData.append("files", this.file);
         try {
           let myImage = await axios
@@ -106,25 +143,16 @@ export default {
             });
           myImage = myImage.data;
           console.log(myImage[0].id);
-          for (let k = 0; k < this.robots.length; k++) {
-            if (
-              this.selectedPoster == this.robots[k].userid.username &&
-              this.selectedPoster != null
-            ) {
-              this.post.by = this.robots[k].id;
-            }
-          }
-          this.post.images = {  
+
+          this.newProfile.photo = {
             id: myImage[0].id,
           };
 
-          if (this.post.status) {
-            this.post.publishTime = new Date();
-          }
+
           // this.$router.push("/clients/note-de-frais/" + result.data.id);
           console.log(this.post);
           let result2 = await axios.post(
-            process.env.baseUrl + "/posts",
+            process.env.baseUrl + "/user",
             this.post
           );
           console.log(result2.data);
@@ -274,7 +302,7 @@ export default {
                   </vue-dropzone> -->
                 <input type="file" id="file" ref="file" class="m-2" v-on:change="handleFileUpload()" />
                 <center>
-                  <b-button variant="primary" @click="submit">
+                  <b-button variant="primary" @click="createNewUser">
                     <span v-if="loading" class="spinner-border spinner-border-sm" role="status"
                       aria-hidden="true"></span>
                     Submit
