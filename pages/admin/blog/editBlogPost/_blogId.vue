@@ -66,6 +66,9 @@ export default {
       this.file = this.$refs.file.files[0];
       this.blogPost.images=null
     },
+     goBack() {
+      this.$router.go(-1);
+    },
     async submit() {
       let formData = new FormData();
 
@@ -128,6 +131,14 @@ export default {
 <template>
   <div>
     <PageHeader :title="title" :items="items" />
+     <div class="row mb-3">
+        <div class="col-auto">
+          <b-button variant="primary" @click="goBack">
+            <i class="uil uil-arrow-left mr-2"></i>
+            go back
+          </b-button>
+        </div>
+      </div>
     <div class="row">
       <div class="col-12">
         <div class="card">

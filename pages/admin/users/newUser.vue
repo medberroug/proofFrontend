@@ -63,6 +63,7 @@ export default {
         blocked: false,
         confirmed: true,
       },
+      numberOfusers: null,
       newProfile: {
         firstName: null,
         lastName: null,
@@ -127,16 +128,17 @@ export default {
           }
         );
         this.showCreated = true;
-        const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-        await delay(5000);
-        this.$router.push("/admin/users/user/" + result3.data.id);
+        // const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+        // await delay(5000);
+        // this.$router.push("/admin/users/user/" + result3.data.id);
+        this.$router.go();
       } catch (error) {
         console.log(error);
       }
     },
-    goBack(){
-      this.$router.go(-1)
-    }
+    goBack() {
+      this.$router.go(-1);
+    },
   },
   async mounted() {
     try {
@@ -153,6 +155,17 @@ export default {
       for (let j = 0; j < allRobotUsers.length; j++) {
         this.robotsList.push(allRobotUsers[j].userid.username);
       }
+      let numberOfusers = await axios.get(process.env.baseUrl + "/users/count");
+      numberOfusers = numberOfusers.data + 1;
+      this.numberOfusers = numberOfusers;
+      this.newUser.email = "user" + numberOfusers + "@prooftest.ma";
+      this.newUser.password = "password";
+      this.newUser.passwordRetype = "password";
+      this.newProfile.phone = "00212600000000";
+      this.newProfile.firstName = "FN" + numberOfusers;
+      this.newProfile.lastName = "LN" + numberOfusers;
+      this.newProfile.address.city = "Rabat_Test";
+      this.newProfile.badge = null;
       console.log(this.robotsList);
       this.robots = allRobotUsers;
     } catch (error) {
@@ -167,20 +180,18 @@ export default {
   <div>
     <PageHeader :title="title" :items="items" />
     <div class="row mb-3">
-        <div class="col-auto">
-          <b-button variant="primary" @click="goBack">
-            <i class="uil uil-arrow-left mr-2"></i>
-            go back
-          </b-button>
-        </div>
-
-       
-      </div> 
-    <div class="row ">
+      <div class="col-auto">
+        <b-button variant="primary" @click="goBack">
+          <i class="uil uil-arrow-left mr-2"></i>
+          go back
+        </b-button>
+      </div>
+    </div>
+    <div class="row">
       <div class="col-12">
         <b-alert show v-if="showCreated" variant="success" class="mb-3">
-          <i class="uil uil-check"></i> <b>New user was been created</b>, you
-          will be redirected to it in 5 seconds...
+          <i class="uil uil-check"></i> <b>New user was been created</b>, page
+          will reload to add another user...
         </b-alert>
         <div class="card">
           <div class="card-body">
@@ -198,6 +209,7 @@ export default {
                   <b-form-input
                     v-model="newUser.password"
                     type="password"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
 
@@ -209,12 +221,14 @@ export default {
                   <b-form-input
                     v-model="newUser.passwordRetype"
                     type="password"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
                 <b-form-group class="mb-3" label="Email" label-for="title">
                   <b-form-input
                     v-model="newUser.email"
                     type="text"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
               </div>
@@ -228,12 +242,14 @@ export default {
                   <b-form-input
                     v-model="newProfile.firstName"
                     type="text"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
                 <b-form-group class="mb-3" label="Last name" label-for="title">
                   <b-form-input
                     v-model="newProfile.lastName"
                     type="text"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
 
@@ -245,12 +261,14 @@ export default {
                   <b-form-input
                     v-model="newProfile.phone"
                     type="text"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
                 <b-form-group class="mb-3" label="City" label-for="title">
                   <b-form-input
                     v-model="newProfile.address.city"
                     type="text"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
 
@@ -269,7 +287,7 @@ export default {
                   <b-form-radio
                     v-model="newProfile.badge"
                     class="mb-3"
-                    value=""
+                    value="null"
                     plain
                     >Standard Account
                   </b-form-radio>

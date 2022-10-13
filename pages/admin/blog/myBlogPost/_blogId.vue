@@ -67,6 +67,9 @@ export default {
       this.file = this.$refs.file.files[0];
       this.blogPost.images = null;
     },
+    goBack() {
+      this.$router.go(-1);
+    },
     formateDate(date) {
       let result = format(parseISO(date), "dd/MM/yyyy hh:mm", {
         locale: eoLocale,
@@ -136,6 +139,14 @@ export default {
   <div>
     <PageHeader :title="title" :items="items" />
     <div class="row">
+      <div class="row mb-3">
+        <div class="col-auto">
+          <b-button variant="primary" @click="goBack">
+            <i class="uil uil-arrow-left mr-2"></i>
+            go back
+          </b-button>
+        </div>
+      </div>
       <div class="col-12">
         <div class="card">
           <div class="card-body">
@@ -199,7 +210,6 @@ export default {
                       <h4>Drop files here or click to upload.</h4>
                     </div>
                   </vue-dropzone> -->
-                
                 </b-form-group>
                 <center v-if="blogPost.images">
                   <img
