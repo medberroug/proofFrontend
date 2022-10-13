@@ -6,7 +6,7 @@ import vue2Dropzone from "vue2-dropzone";
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
-import { getData } from "../../../components/controllers/savingData";
+
 /**
  * Editor component
  */
@@ -55,28 +55,8 @@ export default {
       categoriesList: null,
       fileMissing: false,
       file: "",
-      newUser: {
-        username: null,
-        password: null,
-        passwordRetype: null,
-        email: null,
-        blocked: false,
-        confirmed: true,
-      },
-      newProfile: {
-        firstName: null,
-        lastName: null,
-        phone: null,
-        userid: null,
-        badge: null,
-        robot: true,
-        photo: null,
-
-        address: {
-          city: null,
-          country: "Maroc",
-        },
-      },
+      newUser:null,
+      newProfile: null,
       post: {
         text: null,
         status: false,
@@ -134,27 +114,25 @@ export default {
         console.log(error);
       }
     },
-    goBack(){
-      this.$router.go(-1)
-    }
+    goBack() {
+      this.$router.go(-1);
+    },
   },
   async mounted() {
     try {
       this.baseUrl = process.env.baseUrl;
-      let result = await axios.get(process.env.baseUrl + "/categories");
-      result = result.data.category;
-      this.categoriesList = result;
-      console.log(this.categoriesList);
-      let allRobotUsers = await axios.get(
-        process.env.baseUrl + "/userProfiles?robot=true"
+      let newProfile = await axios.get(
+        process.env.baseUrl + "/userProfiles/" + this.$route.params.id
       );
-      allRobotUsers = allRobotUsers.data;
-
-      for (let j = 0; j < allRobotUsers.length; j++) {
-        this.robotsList.push(allRobotUsers[j].userid.username);
-      }
-      console.log(this.robotsList);
-      this.robots = allRobotUsers;
+      newProfile = newProfile.data;
+      this.newProfile = newProfile;
+      let newUser = await axios.get(
+        process.env.baseUrl + "/users/" + newProfile.userid.id
+      );
+      newUser = newUser.data;
+      this.newUser = newUser;
+      console.log(this.newProfile);
+           console.log(this.newUser);
     } catch (error) {
       console.log(error);
     }
@@ -167,16 +145,14 @@ export default {
   <div>
     <PageHeader :title="title" :items="items" />
     <div class="row mb-3">
-        <div class="col-auto">
-          <b-button variant="primary" @click="goBack">
-            <i class="uil uil-arrow-left mr-2"></i>
-            go back
-          </b-button>
-        </div>
-
-       
-      </div> 
-    <div class="row ">
+      <div class="col-auto">
+        <b-button variant="primary" @click="goBack">
+          <i class="uil uil-arrow-left mr-2"></i>
+          go back
+        </b-button>
+      </div>
+    </div>
+    <div class="row" v-if="newProfile && newUser">
       <div class="col-12">
         <b-alert show v-if="showCreated" variant="success" class="mb-3">
           <i class="uil uil-check"></i> <b>New user was been created</b>, you
@@ -192,9 +168,10 @@ export default {
                   <b-form-input
                     v-model="newUser.username"
                     type="text"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
-                <b-form-group class="mb-3" label="Password" label-for="title">
+                <!-- <b-form-group class="mb-3" label="Password" label-for="title">
                   <b-form-input
                     v-model="newUser.password"
                     type="password"
@@ -210,11 +187,12 @@ export default {
                     v-model="newUser.passwordRetype"
                     type="password"
                   ></b-form-input>
-                </b-form-group>
+                </b-form-group> -->
                 <b-form-group class="mb-3" label="Email" label-for="title">
                   <b-form-input
                     v-model="newUser.email"
                     type="text"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
               </div>
@@ -228,12 +206,14 @@ export default {
                   <b-form-input
                     v-model="newProfile.firstName"
                     type="text"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
                 <b-form-group class="mb-3" label="Last name" label-for="title">
                   <b-form-input
                     v-model="newProfile.lastName"
                     type="text"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
 
@@ -245,12 +225,14 @@ export default {
                   <b-form-input
                     v-model="newProfile.phone"
                     type="text"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
                 <b-form-group class="mb-3" label="City" label-for="title">
                   <b-form-input
                     v-model="newProfile.address.city"
                     type="text"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
 
@@ -259,20 +241,9 @@ export default {
                   label="Account type"
                   label-for="title"
                 >
-                  <b-form-radio
-                    v-model="newProfile.badge"
-                    class="custom-radio mb-3"
-                    value="verified"
-                    plain
-                    >Verified
-                  </b-form-radio>
-                  <b-form-radio
-                    v-model="newProfile.badge"
-                    class="mb-3"
-                    value=""
-                    plain
-                    >Standard Account
-                  </b-form-radio>
+                <span v-if="newProfile.badge=='verified'"  class="text-success">  <i class="uil uil-check-circle"></i> <b>Verified Account</b></span>
+                <span v-else  class="text-primary">  <i class="uil uil-check-circle"></i> <b>Standard Account</b></span>
+               
                 </b-form-group>
                 <!-- <b-form-group class="mb-3" label="Publishing date" label-for="title" v-if="post.status == false">
                   <b-form-input id="date-time" type="datetime-local" v-model="post.publishTime"></b-form-input>
@@ -303,24 +274,12 @@ export default {
                       <h4>Drop files here or click to upload.</h4>
                     </div>
                   </vue-dropzone> -->
-                <input
-                  type="file"
-                  id="file"
-                  ref="file"
-                  class="m-2"
-                  v-on:change="handleFileUpload()"
-                />
-                <center>
-                  <b-button variant="primary" @click="createNewUser">
-                    <span
-                      v-if="loading"
-                      class="spinner-border spinner-border-sm"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                    Submit
-                    <!-- <i class="uil uil-plus mr-2"></i> -->
-                  </b-button>
+              
+                <center v-if="newProfile.photo" >
+                  <img  :src="baseUrl+newProfile.photo.url" alt="" width="80%">
+                </center>
+                   <center v-else >
+                  <p class="greyText">This profile does not have a photo.</p>
                 </center>
               </div>
             </div>
@@ -334,5 +293,9 @@ export default {
 .vl {
   border-left: 1px solid rgba(0, 0, 0, 0.24);
   height: 100%;
+}
+.greyText {
+    color: gray;
+    
 }
 </style>

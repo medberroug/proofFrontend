@@ -243,7 +243,8 @@ export default {
                 </template>
                 <template v-slot:cell(actions)="data">
                   <ul class="list-inline mb-0">
-                    <li class="list-inline-item">
+                   <Nuxt-link :to="'/admin/users/user/'+data.item.userid">
+                     <li class="list-inline-item">
                       <a
                         href="javascript:void(0);"
                         class="px-2 text-primary"
@@ -253,6 +254,7 @@ export default {
                         <i class="uil uil-eye font-size-18"></i>
                       </a>
                     </li>
+                   </Nuxt-link>
 
                     <li
                       class="list-inline-item"
