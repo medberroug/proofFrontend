@@ -129,7 +129,7 @@ export default {
         this.showCreated = true;
         const delay = (ms) => new Promise((res) => setTimeout(res, ms));
         await delay(5000);
-        this.$router.push("/admin/users/" + result3.data.id);
+        this.$router.push("/admin/users/user/" + result3.data.id);
       } catch (error) {
         console.log(error);
       }
