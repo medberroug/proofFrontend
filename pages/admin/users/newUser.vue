@@ -55,6 +55,26 @@ export default {
       categoriesList: null,
       fileMissing: false,
       file: "",
+      newUser: {
+        username: null,
+        password: null,
+        passwordRetype: null,
+        email: null,
+        blocked: false,
+        confirmed: true,
+      },
+      newProfile: {
+        firstName: null,
+        lastName: null,
+        phone: null,
+        badge: null,
+        robot: null,
+        photo: null,
+        address: {
+          city: null,
+          country: "Maroc",
+        }
+      },
       post: {
         text: null,
         status: false,
@@ -94,7 +114,7 @@ export default {
               this.post.by = this.robots[k].id;
             }
           }
-          this.post.images = {
+          this.post.images = {  
             id: myImage[0].id,
           };
 
@@ -177,88 +197,71 @@ export default {
     <div class="row">
       <div class="col-12">
         <b-alert show v-if="showCreated" variant="success" class="mb-3">
-          <i class="uil uil-check"></i> <b>Community post was been created</b>,
+          <i class="uil uil-check"></i> <b>New user was been created</b>,
           you will be redirected to it in 5 seconds...
         </b-alert>
         <div class="card">
           <div class="card-body">
             <div class="row">
               <div class="col-3 pl-2">
-                <!-- <h4 class="card-title mb-4">Add a new blog post</h4> -->
+                <h5 class="m-3">User account</h5>
                 <!-- Editor -->
-
-                <b-form-group class="mb-3" label="Content" label-for="title">
-                  <textarea
-                    class="form-control"
-                    id="productdesc"
-                    rows="2"
-                    v-model="post.text"
-                  ></textarea>
+                <b-form-group class="mb-3" label="Username" label-for="title">
+                  <textarea class="form-control" id="productdesc" rows="1" v-model="newUser.username"></textarea>
+                </b-form-group>
+                <b-form-group class="mb-3" label="Password" label-for="title">
+                  <textarea class="form-control" id="productdesc" rows="1" v-model="newUser.password"></textarea>
+                </b-form-group>
+                <b-form-group class="mb-3" label="Confirm Password" label-for="title">
+                  <textarea class="form-control" id="productdesc" rows="1" v-model="newUser.passwordRetype"></textarea>
+                </b-form-group>
+                <b-form-group class="mb-3" label="Email" label-for="title">
+                  <textarea class="form-control" id="productdesc" rows="1" v-model="newUser.email"></textarea>
                 </b-form-group>
 
-                <center>
-                  <b-button variant="primary" @click="submit">
-                    <span
-                      v-if="loading"
-                      class="spinner-border spinner-border-sm"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                    Submit
-                    <!-- <i class="uil uil-plus mr-2"></i> -->
-                  </b-button>
-                </center>
+
               </div>
               <div class="col-1 flex d-flex justify-content-center">
                 <div class="vl"></div>
               </div>
 
               <div class="col-4">
-                <b-form-group
-                  class="mb-3"
-                  label="Publishing status"
-                  label-for="title"
-                >
-                  <b-form-radio
-                    v-model="post.status"
-                    class="custom-radio mb-3"
-                    :value="false"
-                    plain
-                    >Publish later</b-form-radio
-                  ><b-form-radio
-                    v-model="post.status"
-                    class="mb-3"
-                    :value="true"
-                    plain
-                    >Publish after submit</b-form-radio
-                  >
+                <h5 class="m-3">Profile</h5>
+                <b-form-group class="mb-3" label="First name" label-for="title">
+                  <textarea class="form-control" id="productdesc" rows="1" v-model="newProfile.firstName"></textarea>
                 </b-form-group>
-                <b-form-group
-                  class="mb-3"
-                  label="Publishing date"
-                  label-for="title"
-                  v-if="post.status == false"
-                >
-                  <b-form-input
-                    id="date-time"
-                    type="datetime-local"
-                    v-model="post.publishTime"
-                  ></b-form-input>
+                <b-form-group class="mb-3" label="Last name" label-for="title">
+                  <textarea class="form-control" id="productdesc" rows="1" v-model="newProfile.lastName"></textarea>
                 </b-form-group>
-                <b-form-group
-                  class="mb-3"
-                  label="User (Robots only)"
-                  label-for="User (Robots only)"
-                >
-                  <multiselect
-                    v-model="selectedPoster"
-                    :options="robotsList"
-                    :multiple="false"
-                  ></multiselect>
-                  <b-form-group class="m-3" label="Image" label-for="Badge">
-                  </b-form-group>
+                <b-form-group class="mb-3" label="Phone Number" label-for="title">
+                  <textarea class="form-control" id="productdesc" rows="1" v-model="newProfile.phone"></textarea>
+                </b-form-group>
+                <b-form-group class="mb-3" label="City" label-for="title">
+                  <textarea class="form-control" id="productdesc" rows="1" v-model="newProfile.address.city"></textarea>
+                </b-form-group>
 
-                  <!-- <vue-dropzone
+                <b-form-group class="mb-3" label="Account type" label-for="title">
+                  <b-form-radio v-model="post.status" class="custom-radio mb-3" value="verified" plain>Verified Account
+                  </b-form-radio>
+                  <b-form-radio v-model="post.status" class="mb-3" value="" plain>Standard Account
+                  </b-form-radio>
+                </b-form-group>
+                <!-- <b-form-group class="mb-3" label="Publishing date" label-for="title" v-if="post.status == false">
+                  <b-form-input id="date-time" type="datetime-local" v-model="post.publishTime"></b-form-input>
+                </b-form-group> -->
+
+              </div>
+              <div class="col-1 flex d-flex justify-content-center">
+                <div class="vl"></div>
+              </div>
+              <div class="col-3">
+                <!-- <b-form-group class="mb-3" label="Publishing date" label-for="title" v-if="post.status == false">
+                  <b-form-input id="date-time" type="datetime-local" v-model="post.publishTime"></b-form-input>
+                </b-form-group> -->
+                <!-- <multiselect v-model="selectedPoster" :options="robotsList" :multiple="false"></multiselect> -->
+                <b-form-group class="m-3" label="Profile Photo" label-for="Badge">
+                </b-form-group>
+                <!-- <vue-dropzone
                     id="dropzone"
                     ref="file"
                     :use-custom-slot="true"
@@ -269,14 +272,16 @@ export default {
                       <h4>Drop files here or click to upload.</h4>
                     </div>
                   </vue-dropzone> -->
-                  <input
-                    type="file"
-                    id="file"
-                    ref="file"
-                    class="m-2"
-                    v-on:change="handleFileUpload()"
-                  />
-                </b-form-group>
+                <input type="file" id="file" ref="file" class="m-2" v-on:change="handleFileUpload()" />
+                <center>
+                  <b-button variant="primary" @click="submit">
+                    <span v-if="loading" class="spinner-border spinner-border-sm" role="status"
+                      aria-hidden="true"></span>
+                    Submit
+                    <!-- <i class="uil uil-plus mr-2"></i> -->
+                  </b-button>
+                </center>
+
               </div>
             </div>
           </div>
