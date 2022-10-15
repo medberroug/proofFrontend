@@ -46,10 +46,12 @@ export default {
         {
           key: "name",
           label: "Name",
+                sortable: true
         },
         {
           key: "rank",
           label: "Rank",
+                sortable: true
         },
         "actions",
       ],

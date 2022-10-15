@@ -46,30 +46,37 @@ export default {
         {
           key: "title",
           label: "Title",
+          sortable: true,
         },
         {
           key: "category",
           label: "Category",
+          sortable: true,
         },
         {
           key: "when",
           label: "Created on",
+          sortable: true,
         },
         {
           key: "nbOfLikes",
           label: "# Of likes",
+          sortable: true,
         },
         {
           key: "nbOfComments",
           label: "# Of Comments",
+          sortable: true,
         },
         {
           key: "status",
           label: "Status",
+          sortable: true,
         },
         {
           key: "publishTime",
           label: "Publish Time",
+          sortable: true,
         },
         "actions",
       ],

@@ -2,6 +2,9 @@
 /**
  * User list component
  */
+import { eoLocale } from "date-fns/locale/fr";
+import { format, parseISO } from "date-fns";
+import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import axios from "axios";
 export default {
   head() {
@@ -11,19 +14,19 @@ export default {
   },
   data() {
     return {
-      title: "Users List",
+      title: "Family",
       baseUrl: null,
       items: [
         {
-          text: "Users",
+          text: "Family",
         },
         {
-          text: "Users List",
+          text: "Children",
           active: true,
         },
       ],
 
-      profiles: [],
+      babies: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -36,32 +39,21 @@ export default {
         {
           key: "fullName",
           label: "Full Name",
-                sortable: true
+          sortable: true,
         },
         {
-          key: "username",
-          label: "Username",
-                sortable: true
+          key: "gender",
+          label: "Gender",
         },
         {
-          key: "phone",
-          label: "Phone",
-                sortable: true
+          key: "parentName",
+          label: "Parent Name",
+          sortable: true,
         },
         {
-          key: "city",
-          label: "City",
-                sortable: true
-        },
-        {
-          key: "accountStatus",
-          label: "Status",
-                sortable: true
-        },
-        {
-          key: "robot",
-          label: "Profile type",
-                sortable: true
+          key: "age",
+          label: "Age",
+          sortable: true,
         },
         "actions",
       ],
@@ -72,7 +64,7 @@ export default {
      * Total no. of records
      */
     rows() {
-      return this.profiles.length;
+      return this.babies.length;
     },
   },
 
@@ -80,33 +72,30 @@ export default {
     try {
       this.totalRows = this.items.length;
       this.baseUrl = process.env.baseUrl;
-      console.log(process.env.baseUrl + "/userprofiles");
-      let result = await axios.get(process.env.baseUrl + "/userprofiles");
+      console.log(process.env.baseUrl + "/children");
+      let result = await axios.get(process.env.baseUrl + "/children");
       result = result.data;
 
       for (let i = 0; i < result.length; i++) {
-        let accountStatus = "active";
-        if (result[i].userid.blocked) {
-          accountStatus = "blocked";
-        } else if (!result[i].userid.confirmed && !result[i].userid.blocked) {
-          accountStatus = "pending";
-        }
-        let newProfile = {
+        let birthdayDistance = formatDistanceToNow(
+          parseISO(result[i].birthday),
+          {
+            locale: eoLocale,
+          }
+        );
+        let newBaby = {
           id: result[i].id,
-          userid: result[i].userid.id,
           fullName: result[i].firstName + " " + result[i].lastName,
-          city: result[i].address ? result[i].address.city: "-",
+          gender: result[i].gender,
           photo: result[i].photo ? this.baseUrl + result[i].photo.url : null,
-          phone: result[i].phone,
-          accountStatus: accountStatus,
-          robot: result[i].robot,
-          username: result[i].userid.username,
-          blocked: result[i].userid.blocked,
-          confirmed: result[i].userid.confirmed,
+          parentName:
+            result[i].parent.firstName + " " + result[i].parent.lastName,
+          age: birthdayDistance,
+          parentId: result[i].parent.id,
         };
-        this.profiles.push(newProfile);
+        this.babies.push(newBaby);
       }
-      console.log(this.profiles);
+      console.log(this.babies);
       console.log("XX");
     } catch (error) {
       console.log(error);
@@ -154,7 +143,7 @@ export default {
   <div>
     <PageHeader :title="title" :items="items" />
 
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-sm-12 col-md-3">
         <NuxtLink to="/admin/users/newUser">
           <b-button variant="primary">
@@ -163,7 +152,7 @@ export default {
           </b-button></NuxtLink
         >
       </div>
-    </div>
+    </div> -->
     <div class="row mt-3">
       <div class="col-12">
         <div class="card">
@@ -172,7 +161,7 @@ export default {
             <div class="table-responsive mb-0">
               <b-table
                 class="table table-centered table-nowrap"
-                :items="profiles"
+                :items="babies"
                 :fields="fields"
                 responsive="sm"
                 :per-page="perPage"
@@ -211,19 +200,16 @@ export default {
                     <b> {{ data.item.fullName }}</b>
                   </a>
                 </template>
-                <template v-slot:cell(accountStatus)="data">
-                  <div
-                    class="badge badge-pill bg-soft-success font-size-12"
-                    :class="{
-                      'bg-soft-warning': data.item.accountStatus === 'pending',
-                      'bg-soft-success': data.item.accountStatus === 'active',
-                      'bg-soft-danger': data.item.accountStatus === 'blocked',
-                    }"
-                  >
-                    {{ data.item.accountStatus }}
-                  </div>
+
+                <template v-slot:cell(parentName)="data">
+                  <NuxtLink :to="'/admin/users/user/' + data.item.parentId">
+                    <span class="text-dark">
+                      {{ data.item.parentName }}
+                      <i class="uil uil-arrow-up-right"></i
+                    ></span>
+                  </NuxtLink>
                 </template>
-               
+
                 <template v-slot:cell(robot)="data">
                   <div
                     class="
@@ -250,7 +236,7 @@ export default {
                 </template>
                 <template v-slot:cell(actions)="data">
                   <ul class="list-inline mb-0">
-                    <Nuxt-link :to="'/admin/users/user/' + data.item.id">
+                    <Nuxt-link :to="'/admin/family/child/' + data.item.id">
                       <li class="list-inline-item">
                         <a
                           href="javascript:void(0);"

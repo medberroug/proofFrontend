@@ -56,38 +56,38 @@ export const menuItems = [
         subItems: [
             {
                 id: 3,
-                label: 'menuitems.uielements.list.alerts',
-                link: '/admin'
+                label: 'Children',
+                link: '/admin/family/list'
             },
 
         ]
     },
-    {
-        id: 8,
-        label: 'Automation',
-        icon: 'uil-robot',
-        subItems: [
-            {
-                id: 3,
-                label: 'menuitems.uielements.list.alerts',
-                link: '/admin'
-            },
+    // {
+    //     id: 8,
+    //     label: 'Automation',
+    //     icon: 'uil-robot',
+    //     subItems: [
+    //         {
+    //             id: 3,
+    //             label: 'menuitems.uielements.list.alerts',
+    //             link: '/admin'
+    //         },
 
-        ]
-    },
-    {
-        id: 9,
-        label: 'Settings',
-        icon: 'uil-cog',
-        subItems: [
-            {
-                id: 3,
-                label: 'menuitems.uielements.list.alerts',
-                link: '/admin'
-            },
+    //     ]
+    // },
+    // {
+    //     id: 9,
+    //     label: 'Settings',
+    //     icon: 'uil-cog',
+    //     subItems: [
+    //         {
+    //             id: 3,
+    //             label: 'menuitems.uielements.list.alerts',
+    //             link: '/admin'
+    //         },
 
-        ]
-    }
+    //     ]
+    // }
 
 
 

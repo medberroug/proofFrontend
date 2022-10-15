@@ -23,14 +23,14 @@ export default {
 
   data() {
     return {
-      title: "New user",
+      title: "User Account",
       items: [
         {
           text: "Users",
           href: "/",
         },
         {
-          text: "New user",
+          text: "User Account",
           active: true,
         },
       ],
@@ -55,7 +55,7 @@ export default {
       categoriesList: null,
       fileMissing: false,
       file: "",
-      newUser:null,
+      newUser: null,
       newProfile: null,
       post: {
         text: null,
@@ -132,7 +132,7 @@ export default {
       newUser = newUser.data;
       this.newUser = newUser;
       console.log(this.newProfile);
-           console.log(this.newUser);
+      console.log(this.newUser);
     } catch (error) {
       console.log(error);
     }
@@ -229,11 +229,16 @@ export default {
                   ></b-form-input>
                 </b-form-group>
                 <b-form-group class="mb-3" label="City" label-for="title">
-                  <b-form-input
-                    v-model="newProfile.address.city"
-                    type="text"
-                    disabled
-                  ></b-form-input>
+                  <div v-if="newProfile.address">
+                    <b-form-input
+                      v-model="newProfile.address.city"
+                      type="text"
+                      disabled
+                    ></b-form-input>
+                  </div>
+                  <div v-else>
+                    <b-form-input type="text" disabled></b-form-input>
+                  </div>
                 </b-form-group>
 
                 <b-form-group
@@ -241,9 +246,17 @@ export default {
                   label="Account type"
                   label-for="title"
                 >
-                <span v-if="newProfile.badge=='verified'"  class="text-success">  <i class="uil uil-check-circle"></i> <b>Verified Account</b></span>
-                <span v-else  class="text-primary">  <i class="uil uil-check-circle"></i> <b>Standard Account</b></span>
-               
+                  <span
+                    v-if="newProfile.badge == 'verified'"
+                    class="text-success"
+                  >
+                    <i class="uil uil-check-circle"></i>
+                    <b>Verified Account</b></span
+                  >
+                  <span v-else class="text-primary">
+                    <i class="uil uil-check-circle"></i>
+                    <b>Standard Account</b></span
+                  >
                 </b-form-group>
                 <!-- <b-form-group class="mb-3" label="Publishing date" label-for="title" v-if="post.status == false">
                   <b-form-input id="date-time" type="datetime-local" v-model="post.publishTime"></b-form-input>
@@ -274,11 +287,15 @@ export default {
                       <h4>Drop files here or click to upload.</h4>
                     </div>
                   </vue-dropzone> -->
-              
-                <center v-if="newProfile.photo" >
-                  <img  :src="baseUrl+newProfile.photo.url" alt="" width="80%">
+
+                <center v-if="newProfile.photo">
+                  <img
+                    :src="baseUrl + newProfile.photo.url"
+                    alt=""
+                    width="80%"
+                  />
                 </center>
-                   <center v-else >
+                <center v-else>
                   <p class="greyText">This profile does not have a photo.</p>
                 </center>
               </div>
@@ -295,7 +312,6 @@ export default {
   height: 100%;
 }
 .greyText {
-    color: gray;
-    
+  color: gray;
 }
 </style>
