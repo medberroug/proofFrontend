@@ -2,6 +2,8 @@
 /**
  * User list component
  */
+import { eoLocale } from "date-fns/locale/eo";
+import { format, parseISO } from "date-fns";
 import axios from "axios";
 export default {
   head() {
@@ -36,32 +38,37 @@ export default {
         {
           key: "fullName",
           label: "Full Name",
-                sortable: true
+          sortable: true,
         },
         {
           key: "username",
           label: "Username",
-                sortable: true
+          sortable: true,
         },
         {
           key: "phone",
           label: "Phone",
-                sortable: true
+          sortable: true,
         },
         {
           key: "city",
           label: "City",
-                sortable: true
+          sortable: true,
+        },
+        {
+          key: "created_at",
+          label: "Created at",
+          sortable: true,
         },
         {
           key: "accountStatus",
           label: "Status",
-                sortable: true
+          sortable: true,
         },
         {
           key: "robot",
           label: "Profile type",
-                sortable: true
+          sortable: true,
         },
         "actions",
       ],
@@ -95,7 +102,7 @@ export default {
           id: result[i].id,
           userid: result[i].userid.id,
           fullName: result[i].firstName + " " + result[i].lastName,
-          city: result[i].address ? result[i].address.city: "-",
+          city: result[i].address ? result[i].address.city : "-",
           photo: result[i].photo ? this.baseUrl + result[i].photo.url : null,
           phone: result[i].phone,
           accountStatus: accountStatus,
@@ -103,6 +110,7 @@ export default {
           username: result[i].userid.username,
           blocked: result[i].userid.blocked,
           confirmed: result[i].userid.confirmed,
+          created_at: result[i].created_at,
         };
         this.profiles.push(newProfile);
       }
@@ -115,7 +123,12 @@ export default {
   methods: {
     /**
      * Search the table data with search input
-     */
+     */ formateDate(date) {
+      let result = format(parseISO(date), "dd/MM/yyyy hh:mm", {
+        locale: eoLocale,
+      });
+      return result;
+    },
     async actionOnUser(id, action) {
       try {
         if (action == "confirm") {
@@ -223,7 +236,11 @@ export default {
                     {{ data.item.accountStatus }}
                   </div>
                 </template>
-               
+                <template v-slot:cell(created_at)="data">
+                  <div>
+                    {{ formateDate(data.item.created_at) }}
+                  </div>
+                </template>
                 <template v-slot:cell(robot)="data">
                   <div
                     class="

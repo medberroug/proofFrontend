@@ -61,6 +61,31 @@ export const menuItems = [
             },
 
         ]
+    },{
+        id: 8,
+        label: 'Market',
+        icon: 'uil-shopping-cart-alt',
+        subItems: [
+            {
+                id: 801,
+                label: 'Subscription plans',
+                link: '/admin/family/list'
+            },{
+                id: 802,
+                label: 'Products',
+                link: '/admin/family/list'
+            },{
+                id: 802,
+                label: 'Orders',
+                link: '/admin/family/list'
+            },{
+                id: 802,
+                label: 'Recurring Orders',
+                link: '/admin/family/list'
+            },
+
+
+        ]
     },
     // {
     //     id: 8,
