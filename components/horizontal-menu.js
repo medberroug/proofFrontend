@@ -40,7 +40,7 @@ export const menuItems = [
         label: 'Community',
         icon: 'uil-comments',
         subItems: [
-          
+
             {
                 id: 602,
                 label: 'Posts',
@@ -61,7 +61,7 @@ export const menuItems = [
             },
 
         ]
-    },{
+    }, {
         id: 8,
         label: 'Market',
         icon: 'uil-shopping-cart-alt',
@@ -69,20 +69,63 @@ export const menuItems = [
             {
                 id: 801,
                 label: 'Subscription plans',
-                link: '/admin/family/list'
-            },{
+                link: '/admin/market/list'
+            }, {
                 id: 802,
                 label: 'Products',
-                link: '/admin/family/list'
-            },{
-                id: 802,
+                link: '/admin/market/products'
+            }, {
+                id: 803,
                 label: 'Orders',
-                link: '/admin/family/list'
-            },{
-                id: 802,
+                link: '/admin/market/list'
+            }, {
+                id: 804,
                 label: 'Recurring Orders',
-                link: '/admin/family/list'
+                link: '/admin/market/list'
+            }, {
+                id: 806,
+                label: 'Invoices & Shipping',
+                subItems: [
+                    {
+                        id: 80601,
+                        label: 'Pending Invoices',
+                        link: '/admin/market/settings',
+                    },
+                    {
+                        id: 80601,
+                        label: 'Archived Invoices',
+                        link: '/admin/market/settings',
+                    }
+                ]
+            }, {
+                id: 805,
+                label: 'Settings',
+                subItems: [
+                    {
+                        id: 80501,
+                        label: 'Categories',
+                        link: '/admin/market/settings',
+                    },
+                    {
+                        id: 80502,
+                        label: 'Producers',
+                        link: '/admin/market/settings',
+                    },
+                    {
+                        id: 80503,
+                        label: 'Tax & Returns',
+                        link: '/admin/market/settings',
+                    },{
+                        id: 80504,
+                        label: 'Shipping Rates',
+                        link: '/admin/market/settings',
+                    }
+
+
+
+                ]
             },
+
 
 
         ]
