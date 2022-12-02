@@ -71,7 +71,7 @@ export default {
         status: false,
         code: null,
         totalRating: 5,
-        category: { id: null },
+        category: null,
         securityStockQuantity: null,
         producer: { id: null },
         discount: null,
@@ -137,11 +137,11 @@ export default {
             });
           }
 
-          for (let j = 0; j < this.categoriesList.length; j++) {
-            if (this.newProduct.category.id == this.categoriesList[j].name) {
-              this.newProduct.category.id = this.categoriesList[j].id;
-            }
-          }
+          // for (let j = 0; j < this.categoriesList.length; j++) {
+          //   if (this.newProduct.category.id == this.categoriesList[j].name) {
+          //     this.newProduct.category = this.categoriesList[j].name;
+          //   }
+          // }
 
           for (let k = 0; k < this.producersList.length; k++) {
             if (this.newProduct.producer.id == this.producersList[k].name) {
@@ -176,7 +176,7 @@ export default {
     try {
       this.baseUrl = process.env.baseUrl;
       let result = await axios.get(process.env.baseUrl + "/productcategories");
-      result = result.data;
+      result = result.data.category;
       this.categoriesList = result;
 
       let result2 = await axios.get(process.env.baseUrl + "/producers");
@@ -362,7 +362,7 @@ export default {
                   ></b-form-input>
                 </b-form-group> -->
                 <b-form-group class="mb-3" label="Category" label-for="title">
-                  <select class="form-select" v-model="newProduct.category.id">
+                  <select class="form-select" v-model="newProduct.category">
                     <option
                       v-for="(category, index) in categoriesList"
                       :key="index"

@@ -110,7 +110,7 @@ export default {
           availableQuantity: calculatedQuantity,
           status: result[i].status,
           code: result[i].code,
-          category: result[i].category.name,
+          category: result[i].category,
           producer: result[i].producer.name,
         };
         products.push(aProduct);

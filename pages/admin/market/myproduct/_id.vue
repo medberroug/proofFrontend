@@ -578,8 +578,8 @@ export default {
                     >
                       <b-form-input
                         for="Category"
-                        placeholder="m² ..."
-                        v-model="newProduct.category.name"
+                        placeholder="Category..."
+                        v-model="newProduct.category"
                         disabled
                       ></b-form-input>
                     </b-form-group>

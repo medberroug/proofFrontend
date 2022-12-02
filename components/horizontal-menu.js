@@ -104,23 +104,18 @@ export const menuItems = [
                     {
                         id: 80501,
                         label: 'Categories',
-                        link: '/admin/market/settings',
+                        link: '/admin/market/settings/categories',
                     },
                     {
                         id: 80502,
                         label: 'Producers',
-                        link: '/admin/market/settings',
+                        link: '/admin/market/settings/producers',
                     },
                     {
                         id: 80503,
-                        label: 'Tax & Returns',
-                        link: '/admin/market/settings',
-                    },{
-                        id: 80504,
-                        label: 'Shipping Rates',
-                        link: '/admin/market/settings',
+                        label: 'Tax & Shipping',
+                        link: '/admin/market/settings/taxandshipping',
                     }
-
 
 
                 ]
