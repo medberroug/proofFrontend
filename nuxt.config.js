@@ -50,7 +50,8 @@ export default {
     "~/plugins/vue-lightbox.js",
     "~/plugins/vue-chartist.js",
     "~/plugins/vue-mask.js",
-    "~/plugins/vue-googlemap.js"
+    "~/plugins/vue-googlemap.js",
+    
   ],
   /*
    ** Auto import components

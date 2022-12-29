@@ -66,38 +66,43 @@ export const menuItems = [
         label: 'Market',
         icon: 'uil-shopping-cart-alt',
         subItems: [
+            // {
+            //     id: 801,
+            //     label: 'Subscription plans',
+            //     link: '/admin/market/list'
+            // }, 
             {
-                id: 801,
-                label: 'Subscription plans',
-                link: '/admin/market/list'
-            }, {
                 id: 802,
                 label: 'Products',
                 link: '/admin/market/products'
-            }, {
-                id: 803,
-                label: 'Orders',
-                link: '/admin/market/list'
-            }, {
-                id: 804,
-                label: 'Recurring Orders',
-                link: '/admin/market/list'
-            }, {
+            }, 
+            // {
+            //     id: 803,
+            //     label: 'Orders',
+            //     link: '/admin/market/orders'
+            // }, 
+            // {
+            //     id: 804,
+            //     label: 'Recurring Orders',
+            //     link: '/admin/market/list'
+            // },
+             {
                 id: 806,
-                label: 'Invoices & Shipping',
+                label: 'Orders',
                 subItems: [
                     {
                         id: 80601,
-                        label: 'Pending Invoices',
-                        link: '/admin/market/settings',
+                        label: 'Active Orders',
+                        link: '/admin/market/orders/active',
                     },
                     {
                         id: 80601,
-                        label: 'Archived Invoices',
-                        link: '/admin/market/settings',
+                        label: 'Archived Orders',
+                        link: '/admin/market/orders/archived',
                     }
                 ]
-            }, {
+            }, 
+            {
                 id: 805,
                 label: 'Settings',
                 subItems: [
